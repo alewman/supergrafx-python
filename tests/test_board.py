@@ -1,6 +1,6 @@
 """The SuperGrafx through the base board's sockets: decode, RAM, IRQ1, ST steering."""
 
-from helpers import VIDEO, ScriptedCpu, standard_display, vdc_reg
+from helpers import VIDEO, PublicOpcodeCpu, ScriptedCpu, standard_display, vdc_reg
 from pcengine_python.machine import LINE_CLOCKS
 
 from supergrafx_python import SuperGrafx
@@ -167,3 +167,15 @@ def test_the_machine_row_is_a_japanese_console_with_two_vdcs_and_32k():
     sg, cpu = machine()
     assert sg.board.machine.country_pc_engine is True and len(sg.board.vdcs) == 2
     assert cpu.read(0x1FE000 + 0x1000) & 0x40  # I/O port D6 = 1 (PC Engine compatible)
+
+
+def test_st_steering_reads_the_public_opcode_and_falls_back_to_the_private_one():
+    # A core with only `_opcode` (the pinned one) and a core with only `opcode` (newer).
+    for cpu_class in (ScriptedCpu, PublicOpcodeCpu):
+        sg = SuperGrafx()
+        cpu = cpu_class(sg.board)
+        cpu.write(VPC + 6, 0x01)
+        cpu.write(0x1FE000, 0x09, 0x03)  # ST0: steered to VDC 2
+        assert sg.vdc2.regs.select == 0x09 and sg.vdc1.regs.select == 0
+        cpu.write(0x1FE000, 0x0A, 0x8D)  # STA: a plain store, not steered
+        assert sg.vdc1.regs.select == 0x0A and sg.vdc2.regs.select == 0x09

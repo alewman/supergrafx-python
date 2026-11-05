@@ -57,3 +57,16 @@ def standard_display(cpu, base, *, cr=0x00C8):
     vdc_reg(cpu, base, 0x0D, 0x00DF)  # VDW
     vdc_reg(cpu, base, 0x0E, 0x000C)  # VCR
     vdc_reg(cpu, base, 0x05, cr)  # CR
+
+
+class PublicOpcodeCpu(ScriptedCpu):
+    """A ScriptedCpu of a core that publishes `opcode` (and, here, nothing a fallback could use)."""
+
+    def __init__(self, board, **kwargs) -> None:
+        super().__init__(board, **kwargs)
+        self.opcode = self._opcode
+        del self._opcode
+
+    def write(self, address: int, value: int, opcode: int = 0x8D) -> None:
+        self.opcode = opcode
+        self.board.write_byte(address, value)

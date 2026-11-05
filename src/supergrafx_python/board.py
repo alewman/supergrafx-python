@@ -49,10 +49,15 @@ class SuperGrafx:
 
     def _store_immediate(self) -> bool:
         """Is the CPU's current cycle the write of an ST0/ST1/ST2? The VPC sees the instruction
-        (docs/issues/0001, "Still open"): the core has no public accessor, so this reads the
-        opcode it fetched last."""
+        (docs/issues/0001, "Still open"). Newer cores publish `HuC6280.opcode`; the core this
+        board is pinned to (via pcengine-python) only keeps the private `_opcode`, so fall back."""
         cpu = self.board.cpu
-        return cpu is not None and getattr(cpu, "_opcode", None) in ST_OPCODES
+        if cpu is None:
+            return False
+        opcode = getattr(cpu, "opcode", None)
+        if opcode is None:
+            opcode = getattr(cpu, "_opcode", None)
+        return opcode in ST_OPCODES
 
     def reset(self, kind: ResetKind) -> None:
         self.board.reset(kind)

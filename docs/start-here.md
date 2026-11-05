@@ -41,9 +41,13 @@ The bank map is the base board's (work RAM in `$F8-$FB`) with 32 KiB instead of 
 `Board.vdcs`, steps, syncs and reads the rows of all of them. With `vdc_count=1` nothing moves
 (tests, and captured frames hashed before and after).
 
-One thing is **not** a socket and not fixed: `ST0-ST2` look like plain stores to `$1FE000/2/3` on the
-bus. `SuperGrafx._store_immediate` reads the core's private `_opcode`; a public accessor in
-huc6280-python would remove that (the same issue file, "Still open").
+One thing is **not** a socket: `ST0-ST2` look like plain stores to `$1FE000/2/3` on the
+bus. `SuperGrafx._store_immediate` reads the core's public `HuC6280.opcode` (huc6280-python commit
+after 34f1570, local until released). **That accessor needs a core release and a repin of
+pcengine-python** (this add-on's pin follows the board's): the currently pinned core (a379416)
+only has the private `_opcode`, so the add-on falls back to it when `opcode` is absent. To try the
+accessor before the repin, run with `PYTHONPATH=/data/emu/huc6280-python/src` (dev-only override;
+nothing is installed or repinned). Once the pinned core has `opcode`, drop the fallback.
 
 ## Module shape
 
