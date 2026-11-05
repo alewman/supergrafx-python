@@ -1,0 +1,27 @@
+name: CI
+
+# Kept minimal (PyPy only, main and pull requests only, superseded runs cancelled). Local only
+# for now: the repository is not pushed. The base board is pinned by git revision (a local
+# repository today), so this file cannot run until both repositories are public.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "pypy3.11"
+      - run: python -m pip install -e ".[dev]"
+      - run: python -m ruff check .
+      - run: python -m ruff format --check .
+      - run: python -m pytest -q

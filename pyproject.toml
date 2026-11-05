@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "supergrafx-python"
+version = "0.0.0.dev0"
+description = "Readable, pure-Python NEC SuperGrafx: pcengine-python plus a second VDC and the HuC6202 VPC, through the base board's sockets"
+readme = "README.md"
+# The floor is the newest Python PyPy supports (3.11 as of PyPy 7.3.20); raise it when PyPy does.
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "alewman" }]
+# The base board, pinned by git revision (a local repository until it is public). Nothing is
+# copied from it. 009d1ee = 5d9dc86 (807a366, M5 closed, plus issue 0001: the board runs one Vdc per
+# Machine.vdc_count) plus the M6 status docs. It brings huc6280-python (a379416) with it.
+# Repin deliberately and rerun the tests and the picture runs (docs/m6-record.md).
+dependencies = [
+    "pcengine-python @ git+file:///data/emu/pcengine-python@009d1ee2b4bbb22e452b920f0360f40517b70da9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    # Pinned: `ruff format --check` must see the formatter the tree was formatted with.
+    "ruff==0.16.8",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/supergrafx_python"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["runs", "tests/runs"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "C4", "SIM", "PERF", "RUF"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["supergrafx_python"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers -ra -m 'not slow'"
+pythonpath = ["src", "tests"]
+markers = ["slow: runs a card for many emulated seconds (pytest -m slow)"]

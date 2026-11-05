@@ -1,0 +1,30 @@
+# Python and package builds
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Virtual environments and tooling
+.venv/
+.venv-*/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# HuCards are bring-your-own, read in place from the library: never commit one.
+*.pce
+*.sgx
+*.bin
+*.rom
+*.7z
+*.zip
+
+# Oracle runs (scripts/sgx_pictures.py): pictures, pickles, MAME output.
+runs/
+tests/runs/
+*.pkl
+*.png
+error.log
