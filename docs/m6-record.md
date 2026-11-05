@@ -136,7 +136,7 @@ line. None is decidable without a console.
 ## Reproducing
 
 ```sh
-.venv-pypy/bin/python -m pytest -q            # 36 tests, CPython too (.venv)
+.venv-pypy/bin/python -m pytest -q            # 37 tests, CPython too (.venv)
 python3 -I scripts/sgx_pictures.py /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl --only Granzort
 python3 -I scripts/sgx_fallback.py /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl
 python3 -I scripts/sgx_mame.py     /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl
