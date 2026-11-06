@@ -13,10 +13,11 @@ license = { file = "LICENSE" }
 authors = [{ name = "alewman" }]
 # The base board, pinned by git revision (a local repository until it is public). Nothing is
 # copied from it. 009d1ee = 5d9dc86 (807a366, M5 closed, plus issue 0001: the board runs one Vdc per
-# Machine.vdc_count) plus the M6 status docs. It brings huc6280-python (a379416) with it.
+# Machine.vdc_count) plus the M6 status docs. bc31f9c adds issue 0002 (port catch_up; no
+# effect on the SuperGrafx, which has no port device) and the public-repository commits. It brings huc6280-python (a379416) with it.
 # Repin deliberately and rerun the tests and the picture runs (docs/m6-record.md).
 dependencies = [
-    "pcengine-python @ git+file:///data/emu/pcengine-python@009d1ee2b4bbb22e452b920f0360f40517b70da9",
+    "pcengine-python @ git+file:///data/emu/pcengine-python@bc31f9cb129c5a6168789aa06036d6d5211f0ca7",
 ]
 
 [project.optional-dependencies]
