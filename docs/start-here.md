@@ -42,12 +42,10 @@ The bank map is the base board's (work RAM in `$F8-$FB`) with 32 KiB instead of 
 (tests, and captured frames hashed before and after).
 
 One thing is **not** a socket: `ST0-ST2` look like plain stores to `$1FE000/2/3` on the
-bus. `SuperGrafx._store_immediate` reads the core's public `HuC6280.opcode` (huc6280-python 87e42f6,
-local until released). **That accessor needs a core release and a repin of
-pcengine-python** (this add-on's pin follows the board's): the currently pinned core (a379416)
-only has the private `_opcode`, so the add-on falls back to it when `opcode` is absent. To try the
-accessor before the repin, run with `PYTHONPATH=/data/emu/huc6280-python/src` (dev-only override;
-nothing is installed or repinned). Once the pinned core has `opcode`, drop the fallback.
+bus. `SuperGrafx._store_immediate` reads the core's public `HuC6280.opcode` (huc6280-python
+v0.2.0, f31b630, which the pinned pcengine-python a0114c5 brings in). The add-on keeps a fallback to
+the private `_opcode` for a core without the accessor (the test double covers both); nothing needs
+a PYTHONPATH override any more.
 
 ## Module shape
 

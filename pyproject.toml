@@ -11,13 +11,13 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
 authors = [{ name = "alewman" }]
-# The base board, pinned by git revision (a local repository until it is public). Nothing is
-# copied from it. 009d1ee = 5d9dc86 (807a366, M5 closed, plus issue 0001: the board runs one Vdc per
-# Machine.vdc_count) plus the M6 status docs. bc31f9c adds issue 0002 (port catch_up; no
-# effect on the SuperGrafx, which has no port device) and the public-repository commits. It brings huc6280-python (a379416) with it.
-# Repin deliberately and rerun the tests and the picture runs (docs/m6-record.md).
+# The base board, pinned by git revision on GitHub (https://github.com/alewman/pcengine-python).
+# Nothing is copied from it. a0114c5 = fc923c5 (issue 0002 port catch_up, no effect on the
+# SuperGrafx; issue 0003 audio mixer) plus the repin of huc6280-python to v0.2.0 (f31b630), which
+# has the public `HuC6280.opcode`. Repin deliberately and rerun the tests and the picture runs
+# (docs/m6-record.md).
 dependencies = [
-    "pcengine-python @ git+file:///data/emu/pcengine-python@bc31f9cb129c5a6168789aa06036d6d5211f0ca7",
+    "pcengine-python @ git+https://github.com/alewman/pcengine-python@a0114c58cc57443ba637af621adb23a0f2690124",
 ]
 
 [project.optional-dependencies]
