@@ -43,7 +43,7 @@ The bank map is the base board's (work RAM in `$F8-$FB`) with 32 KiB instead of 
 
 One thing is **not** a socket: `ST0-ST2` look like plain stores to `$1FE000/2/3` on the
 bus. `SuperGrafx._store_immediate` reads the core's public `HuC6280.opcode` (huc6280-python
-v0.2.0, f31b630, which the pinned pcengine-python a0114c5 brings in). The add-on keeps a fallback to
+since v0.2.0; the pinned pcengine-python b914413 brings in core 9c47c98). The add-on keeps a fallback to
 the private `_opcode` for a core without the accessor (the test double covers both); nothing needs
 a PYTHONPATH override any more.
 
