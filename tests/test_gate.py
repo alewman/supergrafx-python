@@ -4,6 +4,7 @@ Power-up leaves the VPC at `$11 $11 ...` (windows off, VDC 1 only), so a program
 VDC 2 or the VPC must draw what the one-VDC board draws. Uses the Covell CPU test the base board
 fetches (read in place; skipped when absent)."""
 
+import os
 from dataclasses import replace
 from pathlib import Path
 
@@ -15,7 +16,9 @@ from pcengine_python.system import build
 
 from supergrafx_python import SUPERGRAFX, SuperGrafx
 
-CARD = Path("/data/emu/pcengine-python/tests/test_roms/CPU_Test/CPU_Test_10.pce")
+# The base board's fetched test card (its scripts/fetch_references.py), in its checkout.
+BASE = Path(os.environ.get("PCENGINE_PYTHON", "/data/emu/pcengine-python"))
+CARD = BASE / "tests/test_roms/CPU_Test/CPU_Test_10.pce"
 FRAMES = 4
 
 

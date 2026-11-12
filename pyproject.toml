@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "supergrafx-python"
-version = "0.0.0.dev0"
+version = "0.1.0"
 description = "Readable, pure-Python NEC SuperGrafx: pcengine-python plus a second VDC and the HuC6202 VPC, through the base board's sockets"
 readme = "README.md"
 # The floor is the newest Python PyPy supports (3.11 as of PyPy 7.3.20); raise it when PyPy does.
@@ -21,6 +21,10 @@ authors = [{ name = "alewman" }]
 dependencies = [
     "pcengine-python @ git+https://github.com/alewman/pcengine-python@c469e2876f4654d80f49acf55b37bae30ae04cb5",
 ]
+
+[project.urls]
+Homepage = "https://github.com/alewman/supergrafx-python"
+Repository = "https://github.com/alewman/supergrafx-python"
 
 [project.optional-dependencies]
 dev = [

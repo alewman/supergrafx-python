@@ -1,8 +1,7 @@
 name: CI
 
-# Kept minimal (PyPy only, main and pull requests only, superseded runs cancelled). Local only
-# for now: the repository is not pushed. The base board is pinned by git revision (a local
-# repository today), so this file cannot run until both repositories are public.
+# Kept minimal (PyPy only, main and pull requests only, superseded runs cancelled). The base
+# board is installed from its public GitHub repository at the commit pinned in pyproject.toml.
 on:
   push:
     branches: [main]

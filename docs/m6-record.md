@@ -1,8 +1,9 @@
 # Milestone 6 record: the SuperGrafx
 
 Date 2026-11-05. Pins: `pcengine-python` 009d1ee (807a366 + issue 0001 as 5d9dc86 + the M6 status docs), which brings
-`huc6280-python` a379416. Local repository, nothing pushed. Tiers as in the base board's
-[validation.md](../../pcengine-python/docs/validation.md): 1 hardware-captured, 2 hardware-verified
+`huc6280-python` a379416. Local repository, nothing pushed (the status on that date; on GitHub
+since 2026-11-11, and the pins have moved: see `pyproject.toml`). Tiers as in the base board's
+[validation.md](https://github.com/alewman/pcengine-python/blob/main/docs/validation.md): 1 hardware-captured, 2 hardware-verified
 research (MacDonald's `sgxtech.txt`), 3 manufacturer, 4 research, 5 emulator-derived (detectors).
 
 ## Exit (handoff-brief M6)
@@ -29,7 +30,7 @@ the board's `PixelPath`), `VideoPage` (the `$FF:0000-03FF` decode with the compa
 `SuperGrafx` (a base `Board` with `SUPERGRAFX` = 32 KiB RAM + `vdc_count=2`, the VPC as pixel path,
 the page claimed). Nothing is copied from the base board.
 
-**One base-board change** ([pcengine-python/docs/issues/0001](../../pcengine-python/docs/issues/0001-second-vdc-not-run-by-the-board.md),
+**One base-board change** ([pcengine-python/docs/issues/0001](https://github.com/alewman/pcengine-python/blob/main/docs/issues/0001-second-vdc-not-run-by-the-board.md),
 commit 5d9dc86): the board now builds one `Vdc` per `Machine.vdc_count` and steps, syncs, reads and
 ORs IRQ1 over all of them. `vdc_count=1` is unchanged: the base tests pass on CPython and PyPy (230),
 and captured frames (SHA-256 of rows and dividers, 150 frames) of Alien Crush (USA) and Covell's CPU
@@ -139,7 +140,7 @@ picture, rows identical). **The fallback is not a substitute**; it is a correct 
 for the day a SuperGrafx card is wanted as a one-VDC picture, nothing more. The reason to prefer
 the add-on stands on measurement, and the reason to fold it in (the pixel-path socket on the hot
 path) was already refuted in the base board's M3: `PixelPath` costs within noise
-([m3-record.md](../../pcengine-python/docs/m3-record.md), "PixelPath on the per-line path").
+([m3-record.md](https://github.com/alewman/pcengine-python/blob/main/docs/m3-record.md), "PixelPath on the per-line path").
 
 Speed (wall clock, 300 frames, PyPy 7.3.20, niced on a machine at load 25-40, so only the ratio
 is of interest and even that is noisy): add-on 133-432 s against base mode 75-228 s per card, about
@@ -167,7 +168,7 @@ line. None is decidable without a console.
 ## Reproducing
 
 ```sh
-.venv-pypy/bin/python -m pytest -q            # 37 tests, CPython too (.venv)
+.venv-pypy/bin/python -m pytest -q            # 40 tests (37 at M6), CPython too (.venv)
 python3 -I scripts/sgx_pictures.py /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl --only Granzort
 python3 -I scripts/sgx_pictures.py /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl --only Daimakaimura \
     --target 800 --window 8 --press run@400+10 --press run@700+10 --vpc-option PRIORITY_LABELS=sgxtech

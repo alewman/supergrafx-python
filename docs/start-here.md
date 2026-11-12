@@ -1,7 +1,7 @@
 # Start here: the SuperGrafx as an add-on
 
-Read the base board's [docs/sockets.md](../../pcengine-python/docs/sockets.md) ("SuperGrafx: add-on,
-with a measured fallback"), its [handoff-brief.md](../../pcengine-python/docs/handoff-brief.md) (M6 row,
+Read the base board's [docs/sockets.md](https://github.com/alewman/pcengine-python/blob/main/docs/sockets.md) ("SuperGrafx: add-on,
+with a measured fallback"), its [handoff-brief.md](https://github.com/alewman/pcengine-python/blob/main/docs/handoff-brief.md) (M6 row,
 U14) and MacDonald's `sgxtech.txt` (`pcengine-python/reference/docs/sgxtech.txt`, tier 2) first.
 
 ## The machine
@@ -43,7 +43,7 @@ The bank map is the base board's (work RAM in `$F8-$FB`) with 32 KiB instead of 
 
 One thing is **not** a socket: `ST0-ST2` look like plain stores to `$1FE000/2/3` on the
 bus. `SuperGrafx._store_immediate` reads the core's public `HuC6280.opcode` (huc6280-python
-since v0.2.0; the pinned pcengine-python b914413 brings in core 9c47c98). The add-on keeps a fallback to
+since v0.2.0; the pinned pcengine-python brings the core in). The add-on keeps a fallback to
 the private `_opcode` for a core without the accessor (the test double covers both); nothing needs
 a PYTHONPATH override any more.
 
@@ -58,6 +58,8 @@ scripts/
   sgx_ours.py      run a card for N frames, modes sgx | compat | base (the fallback)
   sgx_pictures.py  the five cards against Mesen2 and Beetle PCE (one niced run at a time)
   sgx_mame.py      the five cards against MAME `sgx` (crude statistics)
+  sgx_fallback.py  the cards on the plain base board (the fallback), measured
+  sgx_state.py     save states: the round trip on real cards
 ```
 
 Nothing is copied from the base board; the picture scripts import the base repository's
@@ -84,5 +86,5 @@ stage 1 (saved inside frame 1650, pad input after the save); Daimakaimura in PC 
 
 ## Rules
 
-Python floor 3.11 (PyPy); correct, not fast; HuCards read in place by path, never committed; local git
-only; temp files only in a scratch directory; no destructive one-liners.
+Python floor 3.11 (PyPy); correct, not fast; HuCards read in place by path, never committed;
+temp files only in a scratch directory; no destructive one-liners.
