@@ -63,6 +63,25 @@ scripts/
 Nothing is copied from the base board; the picture scripts import the base repository's
 `scripts/` (tooling) by path (`PCENGINE_PYTHON`, default `/data/emu/pcengine-python`).
 
+## Save states
+
+The base board's `pcengine_python.state` (its docs/start-here.md "Save states") covers the SuperGrafx:
+this package registers itself, and the VPC, the video page and the second VDC are reached from the
+board like any other part.
+
+```python
+from pcengine_python.state import load_state, save_state
+
+data = save_state(system)  # system = SuperGrafx(card=...).build()
+load_state(another, data)  # a SuperGrafx built the same way, the same card
+```
+
+Measured 2026-11-12 (`scripts/sgx_state.py`, PyPy: every CPU bus cycle, the mixed picture, the audio
+and the CPU's state of every frame after the save, on a fresh machine and on one that had run): the
+five library cards saved inside frame 300 with a RUN press before, 60 frames each; Daimakaimura in
+stage 1 (saved inside frame 1650, pad input after the save); Daimakaimura in PC Engine position
+(`--mode compat`). 7 of 7 equal. Unit tests: `tests/test_state.py`.
+
 ## Rules
 
 Python floor 3.11 (PyPy); correct, not fast; HuCards read in place by path, never committed; local git
