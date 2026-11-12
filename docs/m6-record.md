@@ -93,6 +93,31 @@ The figures are the same as above: four cards 1.0000 / 1.0000 against both detec
 1.0000 against Beetle and 0.9959 px / 0.9965 rows against Mesen2 (row 0 only). Frame 600, the
 fallback and MAME were not rerun.
 
+### Past the title: the priority labels in use (C-SGX1, 2026-11-12)
+
+The title screens above do not tell the two readings of the priority codes apart (Daimakaimura at
+300 and 600 is row-identical to both detectors under either). With scripted input (`--press`, the
+same two RUN presses given to the board, Mesen2 and Beetle PCE: `run@400+10`, `run@700+10`) the game
+reaches its opening cutscene (frames 800 and 1000) and stage 1 (1600), where the VPC holds `$75 $56`
+with a window, and the readings draw different pictures:
+
+| Frame | `PRIORITY_LABELS` | Mesen2 rows / px | Beetle rows / px |
+| --- | --- | --- | --- |
+| 800 (cutscene) | `detectors` | 1.0000 / 1.0000 | 1.0000 / 1.0000 |
+| 800 | `sgxtech` | 0.5620 / 0.9249 | 0.5620 / 0.9149 |
+| 1000 (cutscene) | `detectors` | 1.0000 / 1.0000 | 1.0000 / 1.0000 |
+| 1000 | `sgxtech` | 0.5620 / 0.9231 | 0.5620 / 0.9128 |
+| 1600 (stage 1) | `detectors` | 1.0000 / 1.0000 | 1.0000 / 1.0000 |
+| 1600 | `sgxtech` | 0.7686 / 0.9854 | 0.7686 / 0.9835 |
+
+(window 8; the referees' best frames are 799, 1000 and 1592.) Under `sgxtech` the cutscene loses
+its statues and the bodies on the path, and stage 1 loses the time and score display: parts of a
+shipped game's picture are missing, which is evidence about the hardware and not only about the
+detectors (that the `detectors` reading equals the detectors is what it was built to do). Two
+emulator authors could still share one mistake and no console was run, so the entry stays tier 5.
+**Decision (Aubrey, 2026-11-12): the default stays `detectors`.** The stage-1 frame is before any
+enemy appears; later frames depend on the frame a press lands on and were not compared.
+
 ## The base-mode fallback, measured
 
 The fallback is the SuperGrafx **as a mode of the plain board**: `Machine(work_ram_bytes=32 KiB,
@@ -128,7 +153,7 @@ line. None is decidable without a console.
 
 | # | Entry | Sources | Tier | Default (attribute) |
 | --- | --- | --- | --- | --- |
-| **C-SGX1** | Which 2-bit priority code is which. sgxtech: `01b` = VDC 1 sprites behind the VDC 2 background, `10b` = VDC 2 sprites in front of the VDC 1 background. Mednafen and Mesen2 read the register the other way round, and Mednafen's source says Dai Makai Mura uses code `01b` *expecting* VDC 2 sprites in front of VDC 1's background | sgxtech (2) against two detectors and a game's behaviour (5). Daimakaimura is row-identical to both detectors with the VPC at `$77` (code `01b`) | 2 vs 5 | `Vpc.PRIORITY_LABELS = "detectors"`; `"sgxtech"` swaps the two codes; directed tests for both |
+| **C-SGX1** | Which 2-bit priority code is which. sgxtech: `01b` = VDC 1 sprites behind the VDC 2 background, `10b` = VDC 2 sprites in front of the VDC 1 background. Mednafen and Mesen2 read the register the other way round, and Mednafen's source says Dai Makai Mura uses code `01b` *expecting* VDC 2 sprites in front of VDC 1's background | sgxtech (2) against two detectors and a game's behaviour (5). Daimakaimura is row-identical to both detectors with the VPC at `$77` (code `01b`) | 2 vs 5; **decided 2026-11-12 (Aubrey): the detectors' reading stays the default**, after the gameplay frames above (under sgxtech's labels the game's statues and score display are missing) | `Vpc.PRIORITY_LABELS = "detectors"`; `"sgxtech"` swaps the two codes; directed tests for both |
 | **U-SGX1** | Where a window's edge falls: row dot `W - 0x40 + origin(dot clock)`. sgxtech gives only "starts at the leftmost physical pixel; `$0040` is zero width" | Mednafen: origin 32 (5.37 MHz), 46 (7.16), 32 (10.7); Mesen2: 48 at every clock (a 16-dot disagreement at 5.37 MHz). No card here moves a window by frame 300 | 5 | `Vpc.WINDOW_ORIGIN = {4: 32, 3: 46, 2: 32}` |
 | **U-SGX2** | A window of `W <= 0x40` is disabled (also over the left overscan). Mednafen's counter keeps the left overscan in "both windows" even at `W = 0`; Mesen2 covers `W - 16` dots | sgxtech "values smaller than `$0040` disable the window; I haven't checked the overscan" | 2 (text), overscan unchecked | `Vpc.WINDOW_OFF_AT_OR_BELOW = 0x40` |
 | **U-SGX3** | At which dot a VPC register write takes effect mid-line | this model: the first dot whose time is at or after the write (the VCE palette's rule); Mesen2 draws the line up to the write first, Mednafen syncs at the write: same effect to the dot; none of the five cards writes mid-line near frame 300 | 5 | the rule in `Vpc.mix` |
@@ -144,6 +169,8 @@ line. None is decidable without a console.
 ```sh
 .venv-pypy/bin/python -m pytest -q            # 37 tests, CPython too (.venv)
 python3 -I scripts/sgx_pictures.py /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl --only Granzort
+python3 -I scripts/sgx_pictures.py /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl --only Daimakaimura \
+    --target 800 --window 8 --press run@400+10 --press run@700+10 --vpc-option PRIORITY_LABELS=sgxtech
 python3 -I scripts/sgx_fallback.py /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl
 python3 -I scripts/sgx_mame.py     /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl
 ```

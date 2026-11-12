@@ -46,6 +46,9 @@ class Vpc:
     #: expects VDC #2 sprites in front of the VDC #1 background*. A shipped game that works on
     #: hardware outranks the document's labels, so the default follows the detectors. "sgxtech"
     #: swaps the two codes. Tier: detectors + a game's behaviour (5), against tier 2 text.
+    #: Decided 2026-11-12 (Aubrey): this default stays. Past the title Dai Makai Mura's cutscene
+    #: and stage 1 lose their statues and score display under "sgxtech" and are row-identical to
+    #: both detectors under "detectors" (docs/m6-record.md); still no console run.
     PRIORITY_LABELS = "detectors"
 
     #: U-SGX1: where the window edges fall. A window of width W covers the row's dots
