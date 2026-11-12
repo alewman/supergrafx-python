@@ -87,6 +87,12 @@ both detectors; no card holds a non-zero window at the end of a frame at either 
 was driven into gameplay (no input is given), so **window edges against a game are not judged by a
 picture**: the directed tests, and the two detectors' source (U-SGX1), are what judge them.
 
+**Rerun 2026-11-12** after the repin to pcengine-python b914413 (core 9c47c98, decimal `ADC`/`SBC`
+with an invalid BCD digit follow Mednafen's formulas): frame 300, the same script, all five cards.
+The figures are the same as above: four cards 1.0000 / 1.0000 against both detectors, Granzort
+1.0000 against Beetle and 0.9959 px / 0.9965 rows against Mesen2 (row 0 only). Frame 600, the
+fallback and MAME were not rerun.
+
 ## The base-mode fallback, measured
 
 The fallback is the SuperGrafx **as a mode of the plain board**: `Machine(work_ram_bytes=32 KiB,
