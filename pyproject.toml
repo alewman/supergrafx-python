@@ -12,14 +12,15 @@ requires-python = ">=3.11"
 license = { file = "LICENSE" }
 authors = [{ name = "alewman" }]
 # The base board, pinned by git revision on GitHub (https://github.com/alewman/pcengine-python).
-# Nothing is copied from it. c469e28 = b914413 plus the picture scripts' pad input and save
+# Nothing is copied from it. bc9b976 = pcengine-python v0.1.0 (core huc6280-python v0.3.0), over
+# c469e28 = b914413 plus the picture scripts' pad input and save
 # states (pcengine_python.state, which this package registers itself with). b914413 = a0114c5 plus the repin of huc6280-python to 9c47c98 (its
 # issue 0004: decimal ADC/SBC with an invalid BCD digit follow Mednafen's formulas). a0114c5 = fc923c5 (issue 0002 port catch_up, no effect on the
 # SuperGrafx; issue 0003 audio mixer) plus the repin of huc6280-python to v0.2.0 (f31b630), which
 # has the public `HuC6280.opcode`. Repin deliberately and rerun the tests and the picture runs
 # (docs/m6-record.md).
 dependencies = [
-    "pcengine-python @ git+https://github.com/alewman/pcengine-python@c469e2876f4654d80f49acf55b37bae30ae04cb5",
+    "pcengine-python @ git+https://github.com/alewman/pcengine-python@bc9b976f8b6ba29ff16fdcbd527978899d7e54b4",
 ]
 
 [project.urls]
