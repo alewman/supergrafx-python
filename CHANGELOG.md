@@ -2,6 +2,11 @@
 
 Releases are git tags. Not on PyPI (the base board is pinned by git commit).
 
+## 0.1.1 (2026-11-14)
+
+- Base board: pcengine-python 0.2.0 (core huc6280-python 0.4.0; the board's issue 0004). No change
+  in this add-on's own code.
+
 ## 0.1.0 (2026-11-12)
 
 The first release: the NEC SuperGrafx as an add-on to pcengine-python.

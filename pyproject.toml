@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "supergrafx-python"
-version = "0.1.0"
+version = "0.1.1"
 description = "Readable, pure-Python NEC SuperGrafx: pcengine-python plus a second VDC and the HuC6202 VPC, through the base board's sockets"
 readme = "README.md"
 # The floor is the newest Python PyPy supports (3.11 as of PyPy 7.3.20); raise it when PyPy does.
@@ -12,7 +12,8 @@ requires-python = ">=3.11"
 license = { file = "LICENSE" }
 authors = [{ name = "alewman" }]
 # The base board, pinned by git revision on GitHub (https://github.com/alewman/pcengine-python).
-# Nothing is copied from it. bc9b976 = pcengine-python v0.1.0 (core huc6280-python v0.3.0), over
+# Nothing is copied from it. 4c32f26 = pcengine-python v0.2.0 (core huc6280-python v0.4.0), over
+# bc9b976 = pcengine-python v0.1.0 (core huc6280-python v0.3.0), over
 # c469e28 = b914413 plus the picture scripts' pad input and save
 # states (pcengine_python.state, which this package registers itself with). b914413 = a0114c5 plus the repin of huc6280-python to 9c47c98 (its
 # issue 0004: decimal ADC/SBC with an invalid BCD digit follow Mednafen's formulas). a0114c5 = fc923c5 (issue 0002 port catch_up, no effect on the
@@ -20,7 +21,7 @@ authors = [{ name = "alewman" }]
 # has the public `HuC6280.opcode`. Repin deliberately and rerun the tests and the picture runs
 # (docs/m6-record.md).
 dependencies = [
-    "pcengine-python @ git+https://github.com/alewman/pcengine-python@bc9b976f8b6ba29ff16fdcbd527978899d7e54b4",
+    "pcengine-python @ git+https://github.com/alewman/pcengine-python@4c32f26730eb2a95041ec62547f977f97d2ab696",
 ]
 
 [project.urls]
