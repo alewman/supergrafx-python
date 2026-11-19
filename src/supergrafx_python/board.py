@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """The SuperGrafx: the pinned PC Engine board with a machine row, a VPC and a second VDC.
 
 Nothing here is copied from `pcengine-python`; this module only composes it through its sockets

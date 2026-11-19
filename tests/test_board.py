@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """The SuperGrafx through the base board's sockets: decode, RAM, IRQ1, ST steering."""
 
 from helpers import VIDEO, PublicOpcodeCpu, ScriptedCpu, standard_display, vdc_reg

@@ -57,11 +57,14 @@ class Vpc:
     #: [DOC sgxtech "Windows"] the windows start at the leftmost pixel of the physical screen,
     #: which is a width of $0040, and are set in single pixels. The origin per dot clock (divider
     #: 4 = 5.37 MHz, 3 = 7.16, 2 = 10.7) is a closed-box measurement (emulator tier: Beetle PCE
-    #: b96c11e and Mesen2 b9fa69d on scripts/sgx_probe.py's window cards, 2026-11-19): both 32 at
-    #: 5.37 and 10.7 MHz; at 7.16 MHz Beetle PCE 46 and Mesen2 24. 46 is kept, provisional. No
+    #: b96c11e and Mesen2 b9fa69d on scripts/sgx_probe.py's window cards), retaken 2026-11-19 on
+    #: base board pcengine-python 3318027, whose display starts 8 dots earlier in the row: both 24
+    #: at 5.37 and 10.7 MHz; at 7.16 MHz Beetle PCE 38 and Mesen2 16. 38 is kept, provisional.
+    #: (On base board 4c32f26 the same probes gave 32 / 46 (Beetle), 24 (Mesen2) / 32: the
+    #: detectors' edges stayed put against the picture, the picture moved in the row.) No
     #: library card brings a window edge into view. The measurement is in this board's row dots,
     #: so it is retaken (scripts/sgx_probe.py) whenever the base board's line geometry moves.
-    WINDOW_ORIGIN = {4: 32, 3: 46, 2: 32}  # noqa: RUF012
+    WINDOW_ORIGIN = {4: 24, 3: 38, 2: 24}  # noqa: RUF012
 
     #: U-SGX2: a window width at or below this disables the window (sgxtech, tier 2).
     WINDOW_OFF_AT_OR_BELOW = 0x40

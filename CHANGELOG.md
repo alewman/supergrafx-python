@@ -5,6 +5,21 @@ Releases are git tags. Not on PyPI (the base board is pinned by git commit).
 
 ## Unreleased
 
+Repin to the base board's clean rewrite (docs/restart.md, "Repin to the clean base board"):
+
+- Base board pcengine-python **3318027** (its clean VDC rewrite; core huc6280-python 6ce348e),
+  not yet on GitHub: the venvs install it from the local clones (pin comment). Save states from
+  the old pin do not load. No code used the removed base interfaces; nothing to adapt.
+- **U-SGX1 re-measured**: the base board's display starts 8 dots earlier in the row, and the
+  probes put both detectors' window edges 8 dots earlier in row dots: `Vpc.WINDOW_ORIGIN` is now
+  `{4: 24, 3: 38, 2: 24}` (was `{4: 32, 3: 46, 2: 32}`); 7.16 MHz stays Beetle PCE's value,
+  provisional (Mesen2 16).
+- Judges unchanged: 44 tests; the five cards and Daimakaimura's three later frames give the same
+  rows against Mesen2 and Beetle PCE; the probes give the same figures after the re-measure.
+- Scripts and a test default the base board's checkout to the sibling `../pcengine-python`
+  (no machine path); the documents name the card set as `$NO_INTRO_DIR/...`; SPDX headers on
+  every file.
+
 Clean rewrite of the items the 2026-11-13 provenance audit marked unclear (docs/restart.md,
 docs/provenance.md). **No default and no behaviour changed.**
 

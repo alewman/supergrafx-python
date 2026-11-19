@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """Save states: the base board's `state.py` over the SuperGrafx (the VPC, the page, both VDCs)."""
 
 import json

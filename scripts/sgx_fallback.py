@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """Measure the base-mode fallback: each SuperGrafx card as the add-on and through the plain board.
 
     python3 -I scripts/sgx_fallback.py LIBDIR SCRATCH RESULTS.jsonl [--only SUBSTR] [--frames 300]
@@ -25,7 +26,9 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = Path(os.environ.get("PCENGINE_PYTHON", "/data/emu/pcengine-python"))
+BASE = Path(
+    os.environ.get("PCENGINE_PYTHON", Path(__file__).resolve().parents[2] / "pcengine-python")
+)
 sys.path.insert(0, str(BASE / "scripts"))
 import m5_sweep  # noqa: E402
 

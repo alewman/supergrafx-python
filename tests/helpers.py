@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """Small drivers for the board-level tests (the base board's own fakes live in its tests)."""
 
 from __future__ import annotations

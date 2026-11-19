@@ -7,7 +7,7 @@ and Beetle PCE as closed boxes, and the pictures measured (U-SGX1, U-SGX5).
 
 Needs numpy and Pillow (the system python3); the board runs under `.venv-pypy`. The detectors are
 driven by the base board's runners (`m2_refs.run_one`, tooling, imported by path from
-`$PCENGINE_PYTHON`, default /data/emu/pcengine-python), one after the other under `nice`. The
+`$PCENGINE_PYTHON`, default the sibling checkout `../pcengine-python`), one after the other under `nice`. The
 images are written into SCRATCH as `.sgx` files (the detectors pick the SuperGrafx by that
 extension) and are not committed. One JSON line per probe and judge goes to RESULTS.
 
@@ -291,7 +291,9 @@ def main() -> int:
     p.add_argument("--build-only", action="store_true")
     a = p.parse_args()
     a.scratch.mkdir(parents=True, exist_ok=True)
-    base = Path(os.environ.get("PCENGINE_PYTHON", "/data/emu/pcengine-python"))
+    base = Path(
+        os.environ.get("PCENGINE_PYTHON", Path(__file__).resolve().parents[2] / "pcengine-python")
+    )
     sys.path.insert(0, str(base / "scripts"))
     import m2_compare as cmp
     import m2_refs

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """The five SuperGrafx cards against Mesen2 and Beetle PCE, one niced run at a time (M6).
 
     python3 -I scripts/sgx_pictures.py LIBDIR SCRATCH RESULTS.jsonl [--only SUBSTR]
@@ -27,7 +28,9 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = Path(os.environ.get("PCENGINE_PYTHON", "/data/emu/pcengine-python"))
+BASE = Path(
+    os.environ.get("PCENGINE_PYTHON", Path(__file__).resolve().parents[2] / "pcengine-python")
+)
 sys.path.insert(0, str(BASE / "scripts"))
 import m2_refs  # noqa: E402
 import m5_sweep  # noqa: E402

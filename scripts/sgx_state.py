@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """Save states on the SuperGrafx: a run saved and loaded continues as the run that wasn't.
 
     .venv-pypy/bin/python scripts/sgx_state.py CARD.sgx... [--at 300] [--to 360] [--extra 777]
@@ -22,7 +23,9 @@ from pcengine_python.cards import card_from_path
 
 from supergrafx_python import SuperGrafx
 
-BASE = Path(os.environ.get("PCENGINE_PYTHON", "/data/emu/pcengine-python"))
+BASE = Path(
+    os.environ.get("PCENGINE_PYTHON", Path(__file__).resolve().parents[2] / "pcengine-python")
+)
 sys.path.insert(0, str(BASE / "scripts"))
 import presses as press_script  # noqa: E402
 from state_roundtrip import roundtrip  # noqa: E402

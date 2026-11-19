@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """The SuperGrafx's row of the machine table (docs/sockets.md of the pinned board).
 
 [hw: sgxtech, "Overview"] a PC Engine with 32 KiB of work RAM instead of 8 KiB, a second VDC with

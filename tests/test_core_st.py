@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """ST0/ST1/ST2 through the real HuC6280 core: the VPC sees the instruction, not the address."""
 
 from pcengine_python.cards import RomCard

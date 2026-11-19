@@ -139,7 +139,7 @@ def test_sgxtech_labels_swap_the_two_codes_and_nothing_else():
 # --- windows [hw: sgxtech "Windows"] -----------------------------------------------------------
 
 
-def width_for(edge, origin=32):
+def width_for(edge, origin=Vpc.WINDOW_ORIGIN[4]):
     """The window register value whose right edge falls on row dot `edge` at 5.37 MHz."""
     return 0x40 + edge - origin
 
@@ -185,13 +185,15 @@ def test_one_pixel_steps_move_the_edge_by_one_dot():
         configure(vpc, none=0x1, w1=0x2)
         vpc.write(0x0A, width, 0)
         out.append(mix(vpc, row(BG1, 128), row(BG2, 128)).count(BG2))
-    assert out == [0x20 + 32, 0x21 + 32, 0x22 + 32]  # width - 0x40 + origin
+    origin = Vpc.WINDOW_ORIGIN[4]
+    assert out == [0x20 + origin, 0x21 + origin, 0x22 + origin]  # width - 0x40 + origin
 
 
 def test_the_edge_origin_follows_the_dot_clock():
-    """U-SGX1: closed-box measurement (emulator tier) on scripts/sgx_probe.py: Beetle PCE b96c11e
-    at all three clocks; Mesen2 b9fa69d agrees at 5.37 and 10.7 MHz, 24 at 7.16 MHz."""
-    for divider, origin in ((4, 32), (3, 46), (2, 32)):
+    """U-SGX1: closed-box measurement (emulator tier) on scripts/sgx_probe.py, retaken
+    2026-11-19 on base board 3318027 (display origin 8 dots earlier in the row): Beetle PCE b96c11e
+    at all three clocks; Mesen2 b9fa69d agrees at 5.37 and 10.7 MHz, 16 at 7.16 MHz."""
+    for divider, origin in ((4, 24), (3, 38), (2, 24)):
         vpc = Vpc()
         configure(vpc, none=0x1, w1=0x2)
         vpc.write(0x0A, 0x50, 0)

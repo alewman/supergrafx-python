@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """The add-on with VDC 2 idle is the base board: same rows as the fallback (base mode).
 
 Power-up leaves the VPC at `$11 $11 ...` (windows off, VDC 1 only), so a program that never touches
@@ -17,7 +18,9 @@ from pcengine_python.system import build
 from supergrafx_python import SUPERGRAFX, SuperGrafx
 
 # The base board's fetched test card (its scripts/fetch_references.py), in its checkout.
-BASE = Path(os.environ.get("PCENGINE_PYTHON", "/data/emu/pcengine-python"))
+BASE = Path(
+    os.environ.get("PCENGINE_PYTHON", Path(__file__).resolve().parents[2] / "pcengine-python")
+)
 CARD = BASE / "tests/test_roms/CPU_Test/CPU_Test_10.pce"
 FRAMES = 4
 

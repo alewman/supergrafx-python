@@ -44,7 +44,8 @@ power-up contents.
 
 ## Pictures (the five library cards)
 
-Cards are read in place from `/data/emu/roms-retrobat/supergrafx/`. Frame 300, `scripts/sgx_pictures.py`
+Cards are read in place from the No-Intro set, `"$NO_INTRO_DIR/NEC - PC Engine SuperGrafx"`.
+Frame 300, `scripts/sgx_pictures.py`
 (ours under PyPy; Mesen2 sprites on and Beetle PCE over frames 297-303, the best frame and the
 dx the base board's M5 comparison finds; equal at the 9-bit palette value):
 
@@ -132,6 +133,15 @@ the same figures before and after on all three judges. Raw lines: runs `clean-re
 `probes-after-2026-11-19` in [m6-results.jsonl](m6-results.jsonl). These depend on the base
 board's VDC, itself being rewritten: re-run them when that lands.
 
+### Repin to the base board's clean rewrite, 2026-11-19 (docs/restart.md)
+
+On pcengine-python 3318027 (display 8 dots earlier in the row): the five cards at frame 300 and
+Daimakaimura at 800, 1000 and 1600 give the same rows against both detectors as above. The window
+probes put every detector's edge 8 dots earlier in our row dots, so U-SGX1 was re-measured:
+`WINDOW_ORIGIN = {4: 24, 3: 38, 2: 24}` (Beetle PCE 24 / 38 / 24, Mesen2 24 / 16 / 24); with it
+the probes give the figures recorded before. Raw lines: runs `base-3318027-2026-11-19`,
+`probes-base-3318027-origin-old`, `probes-base-3318027-origin-remeasured`.
+
 ## The base-mode fallback, measured
 
 The fallback is the SuperGrafx **as a mode of the plain board**: `Machine(work_ram_bytes=32 KiB,
@@ -168,7 +178,7 @@ line. None is decidable without a console.
 | # | Entry | Sources | Tier | Default (attribute) |
 | --- | --- | --- | --- | --- |
 | **C-SGX1** | Which 2-bit priority code is which. sgxtech: `01b` = VDC 1 sprites behind the VDC 2 background, `10b` = VDC 2 sprites in front of the VDC 1 background. Run as closed boxes, Mesen2 and Beetle PCE draw Daimakaimura (which sets code `01b`) as if the two codes were the other way round: its cutscene and first stage are row-identical to both only under the swapped reading, and lose their statues and score display under sgxtech's | sgxtech (2) against two detectors run as closed boxes and a shipped game's picture (5). Daimakaimura is row-identical to both detectors with the VPC at `$77` (code `01b`) | 2 vs 5; **decided 2026-11-12 (Aubrey): the detectors' reading stays the default**, after the gameplay frames above (under sgxtech's labels the game's statues and score display are missing) | `Vpc.PRIORITY_LABELS = "detectors"`; `"sgxtech"` swaps the two codes; directed tests for both |
-| **U-SGX1** | Where a window's edge falls: row dot `W - 0x40 + origin(dot clock)`, counted from the end of horizontal sync. sgxtech: the windows "start from the leftmost pixel of the physical screen ... which is a window width setting of `$0040`", in single pixels | Closed-box measurement, 2026-11-19 (`scripts/sgx_probe.py`: two window pairs per dot clock, one-dot steps, and a width of `$41`): Beetle PCE (b96c11e) puts the origin at 32 (5.37 MHz), 46 (7.16) and 32 (10.7) dots; Mesen2 (b9fa69d) agrees at 5.37 and 10.7 MHz and puts it at 24 at 7.16 MHz (22 dots earlier). MAME 0.285 `sgx` draws no window on the probe (VDC 2 everywhere): uninformative. No library card moves a window edge into view (Daimakaimura's stage 1 holds window 2 at `$3FF`, the whole row) | 5 (closed-box, emulator tier); 7.16 MHz provisional (detectors split) | `Vpc.WINDOW_ORIGIN = {4: 32, 3: 46, 2: 32}` (unchanged) |
+| **U-SGX1** | Where a window's edge falls: row dot `W - 0x40 + origin(dot clock)`, counted from the end of horizontal sync. sgxtech: the windows "start from the leftmost pixel of the physical screen ... which is a window width setting of `$0040`", in single pixels | Closed-box measurement, 2026-11-19 (`scripts/sgx_probe.py`: two window pairs per dot clock, one-dot steps, and a width of `$41`): Beetle PCE (b96c11e) puts the origin at 32 (5.37 MHz), 46 (7.16) and 32 (10.7) dots; Mesen2 (b9fa69d) agrees at 5.37 and 10.7 MHz and puts it at 24 at 7.16 MHz (22 dots earlier). Re-measured on base board 3318027, whose display starts 8 dots earlier in the row: Beetle PCE 24, 38, 24; Mesen2 24, 16, 24. MAME 0.285 `sgx` draws no window on the probe (VDC 2 everywhere): uninformative. No library card moves a window edge into view (Daimakaimura's stage 1 holds window 2 at `$3FF`, the whole row) | 5 (closed-box, emulator tier); 7.16 MHz provisional (detectors split) | `Vpc.WINDOW_ORIGIN = {4: 24, 3: 38, 2: 24}` (was 32 / 46 / 32 on base 4c32f26) |
 | **U-SGX2** | A window of `W <= 0x40` is disabled (also over the left overscan) | sgxtech "values smaller than `$0040` disable the window; I haven't checked the overscan". Probe (`off-*`, `one-*`): with widths `$40` and `$20` both detectors draw the active display outside every window, as this board does; in the left overscan before the origin, Mesen2 at 5.37 MHz draws the window area (dots 14-31), this board does not; Beetle PCE's picture does not reach those dots. A width of `$41` covers one dot past the origin on both detectors, as here | 2 (text); overscan: detectors differ, OBSERVED | `Vpc.WINDOW_OFF_AT_OR_BELOW = 0x40` |
 | **U-SGX3** | At which dot a VPC register write takes effect mid-line | this model's choice: the first dot whose time is at or after the write (the base VCE palette's rule); not measured on a detector; none of the five cards writes mid-line near frame 300 | choice | the rule in `Vpc.mix` |
 | **U-SGX4** | Whether `ST0-ST2` still follow `$0E` bit 0 with the switch in PC Engine position (`$0E` cannot be written there; only a bit left from native mode) | nothing documents it | none | `VideoPage.ST_STEERS_IN_COMPAT = False` |
@@ -182,12 +192,12 @@ line. None is decidable without a console.
 ## Reproducing
 
 ```sh
-.venv-pypy/bin/python -m pytest -q            # 40 tests (37 at M6), CPython too (.venv)
-python3 -I scripts/sgx_pictures.py /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl --only Granzort
-python3 -I scripts/sgx_pictures.py /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl --only Daimakaimura \
+.venv-pypy/bin/python -m pytest -q            # 44 tests (37 at M6), CPython too (.venv)
+python3 -I scripts/sgx_pictures.py "$NO_INTRO_DIR/NEC - PC Engine SuperGrafx" SCRATCH out.jsonl --only Granzort
+python3 -I scripts/sgx_pictures.py "$NO_INTRO_DIR/NEC - PC Engine SuperGrafx" SCRATCH out.jsonl --only Daimakaimura \
     --target 800 --window 8 --press run@400+10 --press run@700+10 --vpc-option PRIORITY_LABELS=sgxtech
-python3 -I scripts/sgx_fallback.py /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl
-python3 -I scripts/sgx_mame.py     /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl
+python3 -I scripts/sgx_fallback.py "$NO_INTRO_DIR/NEC - PC Engine SuperGrafx" SCRATCH out.jsonl
+python3 -I scripts/sgx_mame.py     "$NO_INTRO_DIR/NEC - PC Engine SuperGrafx" SCRATCH out.jsonl
 python3 -I scripts/sgx_probe.py SCRATCH probes.jsonl   # window and backdrop probes (U-SGX1, 2, 5)
 ```
 

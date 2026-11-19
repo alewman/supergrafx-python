@@ -14,7 +14,7 @@ ISC; Shadoff's MIT repositories) found nothing in this repository.
 | --- | --- | --- |
 | `vpc.py`: registers, power-up values, ST steering, the mix | MacDonald's `sgxtech.txt` (research text, facts) | **clean** |
 | `vpc.py` `PRIORITY_LABELS = "detectors"` (C-SGX1) | sgxtech against the two detectors' pictures; settled by closed-box picture runs (Dai Makai Mura row-identical to Mesen2 and Beetle PCE under this setting) and the game's behaviour. 2026-11-19: the comment's report of a GPL emulator's source comment removed | **clean** (fact, closed-box confirmed) |
-| `vpc.py` `WINDOW_ORIGIN = {4: 32, 3: 46, 2: 32}` (U-SGX1) | 2026-11-19: constant, comment and `window_edge` withdrawn unread and rewritten (docs/restart.md). Form `W - $40 + origin`: sgxtech "Windows" (DOC). Origin: closed-box measurement (emulator tier, Beetle PCE b96c11e, Mesen2 b9fa69d; `scripts/sgx_probe.py`): both 32 at 5.37 and 10.7 MHz; 7.16 MHz Beetle 46, Mesen2 24 (default 46, provisional). MAME 0.285 `sgx` draws no window on the probe. The quoted expression is gone | **clean** (closed-box measurement; 7.16 MHz split) |
+| `vpc.py` `WINDOW_ORIGIN` (U-SGX1; `{4: 24, 3: 38, 2: 24}` since the repin to base 3318027, re-measured on the same closed boxes: restart.md) | 2026-11-19: constant, comment and `window_edge` withdrawn unread and rewritten (docs/restart.md). Form `W - $40 + origin`: sgxtech "Windows" (DOC). Origin: closed-box measurement (emulator tier, Beetle PCE b96c11e, Mesen2 b9fa69d; `scripts/sgx_probe.py`): both 32 at 5.37 and 10.7 MHz; 7.16 MHz Beetle 46, Mesen2 24 (default 46, provisional). MAME 0.285 `sgx` draws no window on the probe. The quoted expression is gone | **clean** (closed-box measurement; 7.16 MHz split) |
 | `vpc.py` U-SGX5 (both pixels transparent: VDC 2's backdrop), `_mix_run` | 2026-11-19: `_mix_run` withdrawn unread and rewritten from sgxtech's priority text and the tests. U-SGX5: closed-box measurement (Mesen2 b9fa69d and Beetle PCE b96c11e, `clear-*` probes, three dot clocks, both directions, pixel-identical to ours); MAME `huc6202.cpp` (BSD-3-Clause, read, nothing ported) has the same rule; test added | **clean** (closed-box measurement) |
 | `vpc.py` U-SGX3 comment | named two GPL emulators' drawing internals; 2026-11-19 restated as this model's choice | **clean** |
 | `board.py`, `machine.py` | wiring onto pcengine-python's sockets; sgxtech (32 KiB RAM) | **clean** |
@@ -26,8 +26,10 @@ ISC; Shadoff's MIT repositories) found nothing in this repository.
 
 Counts (2026-11-19): clean 11, cite 0, rewrite 0, unclear 0. Before: clean 6, unclear 2.
 
-Inherited: this board runs on pcengine-python, whose VDC line machine (`vdc/sequencer.py` and
-parts of `vdc/chip.py`) is marked **rewrite** there; both VDCs here are that code.
+Inherited: this board runs on pcengine-python. Its VDC line machine (`vdc/sequencer.py` and
+parts of `vdc/chip.py`), marked **rewrite** in the audit, was rewritten clean there (3318027), and
+this add-on pins that commit since 2026-11-19 ([restart.md](restart.md), "Repin"): both VDCs
+here are now the clean code.
 
 History: 13 commits, no deleted files, no C/C++ code in any added line.
 
@@ -39,5 +41,5 @@ research); MAME `src/devices/video/huc6202.cpp` (BSD-3-Clause, copyright-holders
 as a third opinion, nothing ported, so no notice is carried); Mesen2 b9fa69d and Beetle PCE
 b96c11e run as closed boxes on our own probe cards. The inherited VDC (`pcengine-python`'s
 `vdc/sequencer.py`, `vdc/chip.py`) is being rewritten in the base repository at the same time;
-this add-on's pin (4c32f26) did not move, and its picture results are to be re-run once the base
-board's rewrite lands.
+this add-on's pin (4c32f26) did not move at the time; it moved to 3318027 later the same day and
+the picture results were re-run (restart.md, "Repin to the clean base board").

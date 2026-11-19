@@ -65,7 +65,7 @@ scripts/
 ```
 
 Nothing is copied from the base board; the picture scripts import the base repository's
-`scripts/` (tooling) by path (`PCENGINE_PYTHON`, default `/data/emu/pcengine-python`).
+`scripts/` (tooling) by path (`PCENGINE_PYTHON`, default the sibling checkout `../pcengine-python`).
 
 ## Save states
 

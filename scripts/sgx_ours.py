@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """Run a SuperGrafx HuCard on this board for N frames and save the frame as 9-bit rows.
 
     .venv-pypy/bin/python scripts/sgx_ours.py CARD.sgx OUT.pkl [--frames 300] [--mode sgx|compat|base]
@@ -31,7 +32,9 @@ from pcengine_python.system import build
 
 from supergrafx_python import SUPERGRAFX, SuperGrafx, Vpc
 
-BASE = Path(os.environ.get("PCENGINE_PYTHON", "/data/emu/pcengine-python"))
+BASE = Path(
+    os.environ.get("PCENGINE_PYTHON", Path(__file__).resolve().parents[2] / "pcengine-python")
+)
 sys.path.insert(0, str(BASE / "scripts"))
 import presses as press_script  # noqa: E402
 

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """supergrafx-python: the NEC SuperGrafx as an add-on to pcengine-python, through its sockets."""
 
 from pcengine_python.state import register_package

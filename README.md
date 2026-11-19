@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: MIT -->
 # supergrafx-python
 
 A readable, pure-Python **NEC SuperGrafx** (1989), built as an **add-on to
@@ -22,7 +23,9 @@ python -m venv .venv-pypy   # PyPy 3.11 is the platform; CPython works for the t
 .venv-pypy/bin/python -m pytest -q
 ```
 
-The base board is pinned by its GitHub commit in `pyproject.toml`; `docs/start-here.md` says which sockets are used and why a board change was needed.
+The base board is pinned by its git commit in `pyproject.toml` (on `main` now 3318027, the base
+board's clean rewrite of 2026-11-19, not yet pushed: install it from a local clone as
+[docs/restart.md](docs/restart.md) says); `docs/start-here.md` says which sockets are used and why a board change was needed.
 HuCards are bring-your-own, read in place by path, never committed.
 
 ```python
@@ -37,6 +40,6 @@ rows = sg.board.capture.last_frame.rows  # 242 rows of 9-bit palette values
 ```
 
 Save states: `pcengine_python.state.save_state(system)` and `load_state`
-([docs/start-here.md](docs/start-here.md) "Save states"). Paths under `/data/emu/` in the documents,
-the scripts' defaults and one test are the author's machine (`PCENGINE_PYTHON` names the base
-board's checkout, whose `scripts/` the picture scripts use).
+([docs/start-here.md](docs/start-here.md) "Save states"). The picture scripts use the base board's
+`scripts/` from its checkout (`PCENGINE_PYTHON`, default the sibling `../pcengine-python`) and read
+the cards from `"$NO_INTRO_DIR/NEC - PC Engine SuperGrafx"`.
