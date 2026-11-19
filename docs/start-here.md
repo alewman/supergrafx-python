@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: MIT -->
 # Start here: the SuperGrafx as an add-on
 
 Read the base board's [docs/sockets.md](https://github.com/alewman/pcengine-python/blob/main/docs/sockets.md) ("SuperGrafx: add-on,
@@ -60,6 +61,7 @@ scripts/
   sgx_mame.py      the five cards against MAME `sgx` (crude statistics)
   sgx_fallback.py  the cards on the plain base board (the fallback), measured
   sgx_state.py     save states: the round trip on real cards
+  sgx_probe.py     window and backdrop probe cards of our own, against Mesen2 and Beetle PCE
 ```
 
 Nothing is copied from the base board; the picture scripts import the base repository's

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 [build-system]
 requires = ["hatchling>=1.25"]
 build-backend = "hatchling.build"
@@ -16,7 +17,7 @@ authors = [{ name = "alewman" }]
 # bc9b976 = pcengine-python v0.1.0 (core huc6280-python v0.3.0), over
 # c469e28 = b914413 plus the picture scripts' pad input and save
 # states (pcengine_python.state, which this package registers itself with). b914413 = a0114c5 plus the repin of huc6280-python to 9c47c98 (its
-# issue 0004: decimal ADC/SBC with an invalid BCD digit follow Mednafen's formulas). a0114c5 = fc923c5 (issue 0002 port catch_up, no effect on the
+# issue 0004: decimal ADC/SBC with an invalid BCD digit). a0114c5 = fc923c5 (issue 0002 port catch_up, no effect on the
 # SuperGrafx; issue 0003 audio mixer) plus the repin of huc6280-python to v0.2.0 (f31b630), which
 # has the public `HuC6280.opcode`. Repin deliberately and rerun the tests and the picture runs
 # (docs/m6-record.md).

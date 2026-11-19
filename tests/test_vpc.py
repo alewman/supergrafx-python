@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """The VPC's registers and mix against sgxtech's text (tier 2), with synthetic VDC rows.
 
 A row value is 9 bits: bit 8 sprite, bits 7-4 palette, bits 3-0 colour (0 transparent).
@@ -188,6 +189,8 @@ def test_one_pixel_steps_move_the_edge_by_one_dot():
 
 
 def test_the_edge_origin_follows_the_dot_clock():
+    """U-SGX1: closed-box measurement (emulator tier) on scripts/sgx_probe.py: Beetle PCE b96c11e
+    at all three clocks; Mesen2 b9fa69d agrees at 5.37 and 10.7 MHz, 24 at 7.16 MHz."""
     for divider, origin in ((4, 32), (3, 46), (2, 32)):
         vpc = Vpc()
         configure(vpc, none=0x1, w1=0x2)
@@ -196,13 +199,32 @@ def test_the_edge_origin_follows_the_dot_clock():
 
 
 def test_the_window_origin_is_a_class_attribute():
-    class Mesen(Vpc):
-        WINDOW_ORIGIN = {4: 48, 3: 48, 2: 48}  # noqa: RUF012
+    class Other(Vpc):
+        WINDOW_ORIGIN = {4: 40, 3: 40, 2: 40}  # noqa: RUF012
 
-    vpc = Mesen()
+    vpc = Other()
     configure(vpc, none=0x1, w1=0x2)
     vpc.write(0x0A, 0x50, 0)
-    assert mix(vpc, row(BG1, 128), row(BG2, 128)).count(BG2) == 0x10 + 48
+    assert mix(vpc, row(BG1, 128), row(BG2, 128)).count(BG2) == 0x10 + 40
+
+
+# --- both pixels transparent (U-SGX5) ----------------------------------------------------------
+
+
+@pytest.mark.parametrize("code", [0x0, 0x4, 0x8, 0xC])
+def test_both_transparent_shows_vdc2s_pixel(code):
+    """U-SGX5: closed-box measurement (emulator tier): on scripts/sgx_probe.py's clear-* cards
+    Mesen2 b9fa69d and Beetle PCE b96c11e show VDC 2's value where VDC 1 is in its border ($100)
+    over VDC 2's transparent display ($000), and where VDC 1's display is transparent over VDC 2's
+    border, at every dot clock. sgxtech is silent."""
+    border, clear1, clear2 = 0x100, 0x020, 0x0A0  # transparent values with different codes
+    a = [border, clear1, clear1, border]
+    b = [clear2, border, clear2, border]
+    for labels in ("detectors", "sgxtech"):
+        vpc = Vpc()
+        vpc.PRIORITY_LABELS = labels
+        configure(vpc, none=0x3 | code)
+        assert mix(vpc, a, b) == b
 
 
 # --- writes during the line --------------------------------------------------------------------

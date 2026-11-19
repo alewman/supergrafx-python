@@ -28,3 +28,6 @@ tests/runs/
 *.pkl
 *.png
 error.log
+
+# Withdrawn code (the 2026-11-19 clean rewrite) and probe cards: never committed, not to be read.
+scratch/

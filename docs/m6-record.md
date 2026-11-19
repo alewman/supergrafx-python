@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: MIT -->
 # Milestone 6 record: the SuperGrafx
 
 Date 2026-11-05. Pins: `pcengine-python` 009d1ee (807a366 + issue 0001 as 5d9dc86 + the M6 status docs), which brings
@@ -86,10 +87,11 @@ Same script, `--target 600` (references 597-603):
 Daimakaimura exercises the window registers and the ST steering every frame and stays row-identical to
 both detectors; no card holds a non-zero window at the end of a frame at either checkpoint, and none
 was driven into gameplay (no input is given), so **window edges against a game are not judged by a
-picture**: the directed tests, and the two detectors' source (U-SGX1), are what judge them.
+picture**: the directed tests and, since 2026-11-19, the window probes run on both detectors as
+closed boxes (U-SGX1, U-SGX2 below; `scripts/sgx_probe.py`) are what judge them.
 
 **Rerun 2026-11-12** after the repin to pcengine-python b914413 (core 9c47c98, decimal `ADC`/`SBC`
-with an invalid BCD digit follow Mednafen's formulas): frame 300, the same script, all five cards.
+with an invalid BCD digit: the core's issue 0004): frame 300, the same script, all five cards.
 The figures are the same as above: four cards 1.0000 / 1.0000 against both detectors, Granzort
 1.0000 against Beetle and 0.9959 px / 0.9965 rows against Mesen2 (row 0 only). Frame 600, the
 fallback and MAME were not rerun.
@@ -118,6 +120,17 @@ detectors (that the `detectors` reading equals the detectors is what it was buil
 emulator authors could still share one mistake and no console was run, so the entry stays tier 5.
 **Decision (Aubrey, 2026-11-12): the default stays `detectors`.** The stage-1 frame is before any
 enemy appears; later frames depend on the frame a press lands on and were not compared.
+
+### Clean rewrite, 2026-11-19 (docs/restart.md)
+
+Before and after `Vpc.window_edge` and `Vpc._mix_run` were withdrawn and rewritten (same pin,
+pcengine-python 4c32f26): the five cards at frame 300 are 1.0000 rows against both detectors
+except Granzort against Mesen2 (0.9959, row 0, as above); Daimakaimura with `run@400+10`,
+`run@700+10` at 800, 1000 and 1600 is 1.0000 rows against both, before and after. The probe cards
+(`scripts/sgx_probe.py`, 18 cards: `win-*`, `clear-*`, `off-*`, `one-*` at each dot clock) give
+the same figures before and after on all three judges. Raw lines: runs `clean-rewrite-*` and
+`probes-after-2026-11-19` in [m6-results.jsonl](m6-results.jsonl). These depend on the base
+board's VDC, itself being rewritten: re-run them when that lands.
 
 ## The base-mode fallback, measured
 
@@ -154,15 +167,16 @@ line. None is decidable without a console.
 
 | # | Entry | Sources | Tier | Default (attribute) |
 | --- | --- | --- | --- | --- |
-| **C-SGX1** | Which 2-bit priority code is which. sgxtech: `01b` = VDC 1 sprites behind the VDC 2 background, `10b` = VDC 2 sprites in front of the VDC 1 background. Mednafen and Mesen2 read the register the other way round, and Mednafen's source says Dai Makai Mura uses code `01b` *expecting* VDC 2 sprites in front of VDC 1's background | sgxtech (2) against two detectors and a game's behaviour (5). Daimakaimura is row-identical to both detectors with the VPC at `$77` (code `01b`) | 2 vs 5; **decided 2026-11-12 (Aubrey): the detectors' reading stays the default**, after the gameplay frames above (under sgxtech's labels the game's statues and score display are missing) | `Vpc.PRIORITY_LABELS = "detectors"`; `"sgxtech"` swaps the two codes; directed tests for both |
-| **U-SGX1** | Where a window's edge falls: row dot `W - 0x40 + origin(dot clock)`. sgxtech gives only "starts at the leftmost physical pixel; `$0040` is zero width" | Mednafen: origin 32 (5.37 MHz), 46 (7.16), 32 (10.7); Mesen2: 48 at every clock (a 16-dot disagreement at 5.37 MHz). No card here moves a window by frame 300 | 5 | `Vpc.WINDOW_ORIGIN = {4: 32, 3: 46, 2: 32}` |
-| **U-SGX2** | A window of `W <= 0x40` is disabled (also over the left overscan). Mednafen's counter keeps the left overscan in "both windows" even at `W = 0`; Mesen2 covers `W - 16` dots | sgxtech "values smaller than `$0040` disable the window; I haven't checked the overscan" | 2 (text), overscan unchecked | `Vpc.WINDOW_OFF_AT_OR_BELOW = 0x40` |
-| **U-SGX3** | At which dot a VPC register write takes effect mid-line | this model: the first dot whose time is at or after the write (the VCE palette's rule); Mesen2 draws the line up to the write first, Mednafen syncs at the write: same effect to the dot; none of the five cards writes mid-line near frame 300 | 5 | the rule in `Vpc.mix` |
+| **C-SGX1** | Which 2-bit priority code is which. sgxtech: `01b` = VDC 1 sprites behind the VDC 2 background, `10b` = VDC 2 sprites in front of the VDC 1 background. Run as closed boxes, Mesen2 and Beetle PCE draw Daimakaimura (which sets code `01b`) as if the two codes were the other way round: its cutscene and first stage are row-identical to both only under the swapped reading, and lose their statues and score display under sgxtech's | sgxtech (2) against two detectors run as closed boxes and a shipped game's picture (5). Daimakaimura is row-identical to both detectors with the VPC at `$77` (code `01b`) | 2 vs 5; **decided 2026-11-12 (Aubrey): the detectors' reading stays the default**, after the gameplay frames above (under sgxtech's labels the game's statues and score display are missing) | `Vpc.PRIORITY_LABELS = "detectors"`; `"sgxtech"` swaps the two codes; directed tests for both |
+| **U-SGX1** | Where a window's edge falls: row dot `W - 0x40 + origin(dot clock)`, counted from the end of horizontal sync. sgxtech: the windows "start from the leftmost pixel of the physical screen ... which is a window width setting of `$0040`", in single pixels | Closed-box measurement, 2026-11-19 (`scripts/sgx_probe.py`: two window pairs per dot clock, one-dot steps, and a width of `$41`): Beetle PCE (b96c11e) puts the origin at 32 (5.37 MHz), 46 (7.16) and 32 (10.7) dots; Mesen2 (b9fa69d) agrees at 5.37 and 10.7 MHz and puts it at 24 at 7.16 MHz (22 dots earlier). MAME 0.285 `sgx` draws no window on the probe (VDC 2 everywhere): uninformative. No library card moves a window edge into view (Daimakaimura's stage 1 holds window 2 at `$3FF`, the whole row) | 5 (closed-box, emulator tier); 7.16 MHz provisional (detectors split) | `Vpc.WINDOW_ORIGIN = {4: 32, 3: 46, 2: 32}` (unchanged) |
+| **U-SGX2** | A window of `W <= 0x40` is disabled (also over the left overscan) | sgxtech "values smaller than `$0040` disable the window; I haven't checked the overscan". Probe (`off-*`, `one-*`): with widths `$40` and `$20` both detectors draw the active display outside every window, as this board does; in the left overscan before the origin, Mesen2 at 5.37 MHz draws the window area (dots 14-31), this board does not; Beetle PCE's picture does not reach those dots. A width of `$41` covers one dot past the origin on both detectors, as here | 2 (text); overscan: detectors differ, OBSERVED | `Vpc.WINDOW_OFF_AT_OR_BELOW = 0x40` |
+| **U-SGX3** | At which dot a VPC register write takes effect mid-line | this model's choice: the first dot whose time is at or after the write (the base VCE palette's rule); not measured on a detector; none of the five cards writes mid-line near frame 300 | choice | the rule in `Vpc.mix` |
 | **U-SGX4** | Whether `ST0-ST2` still follow `$0E` bit 0 with the switch in PC Engine position (`$0E` cannot be written there; only a bit left from native mode) | nothing documents it | none | `VideoPage.ST_STEERS_IN_COMPAT = False` |
-| **U-SGX5** | Both VDC pixels transparent in the enabled mix: the result is VDC 2's pixel (its `$000`/`$100` backdrop code) | Mednafen and Mesen2 agree; sgxtech silent | 5 | in `Vpc._mix_run` |
+| **U-SGX5** | Both VDC pixels transparent in the enabled mix: the result is VDC 2's pixel (its `$000`/`$100` backdrop code) | sgxtech silent. Closed-box measurement, 2026-11-19 (`scripts/sgx_probe.py`, `clear-*`: VDC 1's display 32 dots narrower, VDC 2's 32 lines shorter, both transparent): Mesen2 (b9fa69d) and Beetle PCE (b96c11e) show entry `$000` over VDC 2's width and height and `$100` elsewhere, at all three dot clocks, pixel-identical to this board: VDC 2's value wins both where VDC 1 is in its border and where VDC 2 is. MAME's `huc6202.cpp` (BSD-3-Clause, read) takes VDC 2's pixel when VDC 1's colour is 0, the same rule | 5 (closed-box, two detectors and one readable emulator) | in `Vpc._mix_run`; test `test_both_transparent_shows_vdc2s_pixel` |
 | **U-SGX6** | The VPC and VDC 2 accesses cost the same one extra CPU cycle as a VDC access (the base rule for `$FF:0000-07FF`) | MacDonald's "VDC or VCE access takes one more cycle" (pcetech, tier 2) covers the original chips only | 2 (extrapolated) | the base board's `_finish_access` |
 | **U-SGX7** | Work RAM power-up: banks `$F8`/`$FA` mostly zero, `$F9`/`$FB` mostly `$FF`, with some random bytes | sgxtech "Miscellaneous" | 2 | not modelled: zeros (the base U7 default) |
 | **U-SGX8** | S-EXP port (74HC157 mux, output bits 2-7), HuC6280A vs HuC6280 (U6) | sgxtech; no known software | 2 | not built; socket 11 |
+| **C-BEETLE1** | Where only VDC 1 is enabled, Beetle PCE draws entry `$000` in the overscan it shows (the rows above and below the display at every clock, the right border at 10.7 MHz), where Mesen2 and this board draw `$100` (VDC 1's border code, as a PC Engine's overscan); seen on the window probes (2026-11-19), the cause of their 0.9256 rows against Beetle. Not the window edges | detectors disagree, OBSERVED | 5 | none; named here |
 | **C-MESEN1** | Mesen2 draws frame line 14 blank for Madou King Granzort in SuperGrafx **and** PC Engine mode; Beetle and this board draw it | detectors disagree | 5 | none; named in the table |
 
 ## Reproducing
@@ -174,6 +188,7 @@ python3 -I scripts/sgx_pictures.py /data/emu/roms-retrobat/supergrafx SCRATCH ou
     --target 800 --window 8 --press run@400+10 --press run@700+10 --vpc-option PRIORITY_LABELS=sgxtech
 python3 -I scripts/sgx_fallback.py /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl
 python3 -I scripts/sgx_mame.py     /data/emu/roms-retrobat/supergrafx SCRATCH out.jsonl
+python3 -I scripts/sgx_probe.py SCRATCH probes.jsonl   # window and backdrop probes (U-SGX1, 2, 5)
 ```
 
 Every run is one process at a time under `nice -n 10`. Raw result lines of this record:

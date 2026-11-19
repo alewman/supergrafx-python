@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """The HuC6202 video priority controller (VPC): the SuperGrafx's pixel path and its register block.
 
 [hw: sgxtech, "Video Priority Controller"] The VPC
@@ -39,24 +40,27 @@ ST_STEER = 0x0E  # bit 0: ST0-ST2 go to VDC 2
 class Vpc:
     """Registers, ST steering and the mix. `mix(timing, rows)` is the PixelPath."""
 
-    #: C-SGX1 (undecidable without hardware): which 2-bit priority code means what. sgxtech says
+    #: C-SGX1 (undecidable without hardware): which 2-bit priority code means what. [DOC sgxtech]
     #: 01b = "VDC #1 sprites behind the VDC #2 background" and 10b = "VDC #2 sprites in front of
-    #: the VDC #1 background"; Mednafen and Mesen2 (tier 5) read the same register the other way
-    #: round, and Mednafen's source says Dai Makai Mura (Ghouls 'n Ghosts) *uses setting 1 and
-    #: expects VDC #2 sprites in front of the VDC #1 background*. A shipped game that works on
-    #: hardware outranks the document's labels, so the default follows the detectors. "sgxtech"
-    #: swaps the two codes. Tier: detectors + a game's behaviour (5), against tier 2 text.
+    #: the VDC #1 background". [OBSERVED, closed box] Mesen2 and Beetle PCE draw Dai Makai Mura
+    #: (Ghouls 'n Ghosts), which sets code 01b, as if the two were the other way round, and under
+    #: sgxtech's labels the game's statues and score display go missing. A shipped game's picture
+    #: outranks the document's labels, so the default follows the detectors; "sgxtech" swaps the
+    #: two codes. Tier: two detectors + a game's picture (5), against tier 2 text.
     #: Decided 2026-11-12 (Aubrey): this default stays. Past the title Dai Makai Mura's cutscene
     #: and stage 1 lose their statues and score display under "sgxtech" and are row-identical to
     #: both detectors under "detectors" (docs/m6-record.md); still no console run.
     PRIORITY_LABELS = "detectors"
 
     #: U-SGX1: where the window edges fall. A window of width W covers the row's dots
-    #: [0, W - 0x40 + ORIGIN[dot_divider]) and is off for W <= 0x40 (sgxtech: "values smaller
-    #: than $0040 disable the window"; "windows start from the leftmost pixel of the physical
-    #: screen"). The origin per dot clock (4 = 5.37 MHz, 3 = 7.16, 2 = 10.7) is Mednafen's
-    #: calibrated `8 + 24`/`8 + 38`; Mesen2 uses 48 at every clock. Tier 5; the pictures decide
-    #: (docs/m6-record.md).
+    #: [0, W - $40 + origin), dots counted from the end of horizontal sync as `mix` counts them.
+    #: [DOC sgxtech "Windows"] the windows start at the leftmost pixel of the physical screen,
+    #: which is a width of $0040, and are set in single pixels. The origin per dot clock (divider
+    #: 4 = 5.37 MHz, 3 = 7.16, 2 = 10.7) is a closed-box measurement (emulator tier: Beetle PCE
+    #: b96c11e and Mesen2 b9fa69d on scripts/sgx_probe.py's window cards, 2026-11-19): both 32 at
+    #: 5.37 and 10.7 MHz; at 7.16 MHz Beetle PCE 46 and Mesen2 24. 46 is kept, provisional. No
+    #: library card brings a window edge into view. The measurement is in this board's row dots,
+    #: so it is retaken (scripts/sgx_probe.py) whenever the base board's line geometry moves.
     WINDOW_ORIGIN = {4: 32, 3: 46, 2: 32}  # noqa: RUF012
 
     #: U-SGX2: a window width at or below this disables the window (sgxtech, tier 2).
@@ -64,8 +68,7 @@ class Vpc:
 
     #: U-SGX3: the dot, counted from the end of the line's horizontal sync, at which a register
     #: write takes effect is the first dot whose time is at or after the write (the same rule as
-    #: the VCE's palette); Mesen2 and Mednafen both draw the line up to the write first.
-    #: (Documented behaviour of this model, tier 5; not a class switch.)
+    #: the VCE's palette). A choice of this model, not measured; not a class switch.
 
     def __init__(self) -> None:
         self.reset()
@@ -169,7 +172,8 @@ class Vpc:
             )
 
     def window_edge(self, width: int, div: int, dots: int) -> int:
-        """The first row dot outside a window of register value `width` (0 = no window)."""
+        """The first row dot outside a window of `width` (U-SGX1); 0 when the window is off
+        (U-SGX2: a width at or below $40 [DOC sgxtech]), at most `dots`."""
         if width <= self.WINDOW_OFF_AT_OR_BELOW:
             return 0
         return min(dots, width - 0x40 + self.WINDOW_ORIGIN[div])
@@ -199,31 +203,38 @@ class Vpc:
         return out
 
     def _mix_run(self, a: Sequence[int], b: Sequence[int], cfg: int) -> list[int]:
-        """One window area: `cfg` bit 0 enables VDC 1, bit 1 VDC 2, bits 3-2 the priority code."""
-        enable1, enable2, code = cfg & 1, cfg & 2, (cfg >> 2) & 3
-        if not enable1 and not enable2:
-            # [hw: sgxtech] both layers off: colour 0 of the VCE table for every pixel, overscan too
-            return [0] * len(a)
-        if not enable2:
-            return list(a)
-        if not enable1:
+        """Mix a run of dots of one window area: VDC 1's values `a`, VDC 2's `b`, the area's
+        4-bit group `cfg` (bit 0 VDC 1 on, bit 1 VDC 2 on, bits 3-2 the priority code)."""
+        n = len(a)
+        if not cfg & 3:
+            return [0] * n  # [DOC sgxtech] both layers off: colour 0, the overscan too
+        if not cfg & 2:
+            return list(a)  # VDC 1 alone, its transparent values included
+        if not cfg & 1:
             return list(b)
-        if code in (1, 2) and self.PRIORITY_LABELS == "sgxtech":
-            code = 3 - code
-        if code == 1:
-            # VDC 2 sprites in front of the VDC 1 background, behind VDC 1 sprites
-            return [
-                q if (q & SPRITE and not p & SPRITE and q & COLOUR) else (p if p & COLOUR else q)
-                for p, q in zip(a, b, strict=True)
-            ]
-        if code == 2:
-            # VDC 1 sprites behind the VDC 2 background (they stay in front of VDC 2 sprites)
-            return [
-                q if (p & SPRITE and not q & SPRITE and q & COLOUR) else (p if p & COLOUR else q)
-                for p, q in zip(a, b, strict=True)
-            ]
-        # 00b and 11b: VDC 1 over VDC 2 wherever VDC 1 is opaque
-        return [p if p & COLOUR else q for p, q in zip(a, b, strict=True)]
+        code = (cfg >> 2) & 3
+        if self.PRIORITY_LABELS == "sgxtech" and code in (1, 2):
+            code ^= 3  # C-SGX1: the document's labels
+        out: list[int] = []
+        for p, q in zip(a, b, strict=True):
+            front = p
+            if not p & COLOUR:
+                # U-SGX5: VDC 1 transparent, VDC 2's value whatever it is, so both transparent
+                # shows VDC 2's backdrop code. Closed-box measurement (Mesen2 b9fa69d, Beetle PCE
+                # b96c11e, scripts/sgx_probe.py clear-* cards, every dot clock); MAME huc6202.cpp
+                # (BSD-3-Clause) the same. sgxtech silent.
+                front = q
+            elif code == 1:
+                # (detectors' 01b) VDC 2 sprites in front of VDC 1's background, behind its sprites
+                if q & COLOUR and q & SPRITE and not p & SPRITE:
+                    front = q
+            elif code == 2 and p & SPRITE and q & COLOUR and not q & SPRITE:
+                # (detectors' 10b) VDC 1 sprites behind VDC 2's background, in front of its
+                # sprites; [DOC sgxtech] VDC 1 shows only the sprite there, so its background
+                # has a sprite-shaped hole
+                front = q
+            out.append(front)
+        return out
 
 
 class VideoPage:
