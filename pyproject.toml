@@ -13,7 +13,10 @@ requires-python = ">=3.11"
 license = { file = "LICENSE" }
 authors = [{ name = "alewman" }]
 # The base board, pinned by git revision on GitHub (https://github.com/alewman/pcengine-python).
-# Nothing is copied from it. 3318027 = the base board's clean rewrite of 2026-11-19 (a new VDC
+# Nothing is copied from it. 03ac699 = 3318027 plus the crop of a display that starts before
+# the row (a small HDS; the row kept 1365 // divider dots instead of growing; LOCAL ONLY for
+# now, like 3318027: installed from the local clone as below, at this hash).
+# 3318027 = the base board's clean rewrite of 2026-11-19 (a new VDC
 # line machine: display origin 8 dots earlier in the row, vblank_dots default -16, scroll latch,
 # sprite budget from the manual; old save states do not load; core huc6280-python 6ce348e, its
 # own clean rewrite). NOT YET ON GITHUB (local commits, unpushed): until Aubrey pushes both, the
@@ -28,7 +31,7 @@ authors = [{ name = "alewman" }]
 # has the public `HuC6280.opcode`. Repin deliberately and rerun the tests and the picture runs
 # (docs/m6-record.md).
 dependencies = [
-    "pcengine-python @ git+https://github.com/alewman/pcengine-python@3318027e5c34f1e211515f95233a0853938a5f53",
+    "pcengine-python @ git+https://github.com/alewman/pcengine-python@03ac6998c812a291e5f91882552df5ae712ba870",
 ]
 
 [project.urls]

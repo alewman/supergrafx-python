@@ -50,7 +50,7 @@ are installed from the local clones:
 for v in .venv-pypy .venv; do
   $v/bin/python -m pip install --force-reinstall --no-deps \
     "git+file://$PWD/../huc6280-python@6ce348e13c9ef3009bd07e7938c4b48956eeadc6" \
-    "git+file://$PWD/../pcengine-python@3318027e5c34f1e211515f95233a0853938a5f53"
+    "git+file://$PWD/../pcengine-python@03ac6998c812a291e5f91882552df5ae712ba870"
 done
 ```
 
@@ -101,3 +101,24 @@ board with itself, and MAME draws no window on the probes. Raw lines: run
 `{4: 32, 3: 46, 2: 32}`), together with the base board's own changes (pcengine-python
 `docs/restart.md`, "What the Rust transcription must carry", through the pcengine-rust pin).
 Nothing else in this add-on's behaviour changed.
+
+## Repin to pcengine-python 03ac699 (2026-11-19)
+
+The base board's `03ac699` (local, not pushed) crops a display that starts before the row. A small
+HDS puts the display start inside the sync; on `3318027` the row then grew from 341 to 682 dots
+(and pcengine-rust panicked). supergrafx-rust found it with its probe card in PC Engine position
+and on the fallback (its `docs/notes-on-the-reference.md`, item 7). The venvs were reinstalled
+from the local clone at that hash (the command above, with the new hash).
+
+| Judge | On base 3318027 | On base 03ac699 |
+| --- | --- | --- |
+| Quick suite, PyPy and CPython | 44 passed | 44 passed |
+| Window and backdrop probes (15 probe cards x 3 judges) | run `probes-base-3318027-origin-remeasured` | identical figures on every probe and judge (run `probes-base-03ac699-2026-11-19`) |
+| Five cards, frame 300, rows against Mesen2 / Beetle PCE | 1.0000 / 1.0000 on four; Granzort 0.9959 / 1.0000 | the same (run `base-03ac699-2026-11-19`) |
+| supergrafx-rust's probe card, 120 frames, rows of the wrong length (compat / base / sgx mode) | a 682-dot row at frame 102 in compat and base (supergrafx-rust's notes, item 7) | none in any mode; 4 lines start before the row (first = -14 at divider 4) in compat and base, none in sgx |
+
+None of this repository's own probe cards nor the five cards reaches the case; only
+supergrafx-rust's probe card in compat and base mode does. Daimakaimura into stage 1 (frames 800-1600)
+was not rerun: its frame 300 is unchanged, and whether a later line of it reaches the case was not
+checked.
+Nothing in this add-on changed.

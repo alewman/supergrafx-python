@@ -23,8 +23,9 @@ python -m venv .venv-pypy   # PyPy 3.11 is the platform; CPython works for the t
 .venv-pypy/bin/python -m pytest -q
 ```
 
-The base board is pinned by its git commit in `pyproject.toml` (on `main` now 3318027, the base
-board's clean rewrite of 2026-11-19, not yet pushed: install it from a local clone as
+The base board is pinned by its git commit in `pyproject.toml` (on `main` now 03ac699, the base
+board's clean rewrite of 2026-11-19 (3318027) and the crop of a display that starts before the
+row, not yet pushed: install it from a local clone as
 [docs/restart.md](docs/restart.md) says); `docs/start-here.md` says which sockets are used and why a board change was needed.
 HuCards are bring-your-own, read in place by path, never committed.
 

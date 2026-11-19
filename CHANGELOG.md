@@ -5,6 +5,10 @@ Releases are git tags. Not on PyPI (the base board is pinned by git commit).
 
 ## Unreleased
 
+- Base board pcengine-python **03ac699** (local): a display that starts before the row is
+  cropped and the row keeps its length (found by supergrafx-rust's probe card in compat and base
+  mode). Quick suite, the probes and the five cards unchanged (docs/restart.md, last section).
+
 Repin to the base board's clean rewrite (docs/restart.md, "Repin to the clean base board"):
 
 - Base board pcengine-python **3318027** (its clean VDC rewrite; core huc6280-python 6ce348e),
