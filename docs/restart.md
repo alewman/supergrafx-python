@@ -102,9 +102,14 @@ board with itself, and MAME draws no window on the probes. Raw lines: run
 `docs/restart.md`, "What the Rust transcription must carry", through the pcengine-rust pin).
 Nothing else in this add-on's behaviour changed.
 
+**Pushed (2026-11-20).** Both commits are on GitHub now, and a plain `pip install -e ".[dev]"`
+installs the pins from there (checked in a fresh PyPy venv). The local-clone command above
+installed the core with `--no-deps`, which leaves out its own dependency, 6502-python (2146eba);
+it worked only in venvs that already had it.
+
 ## Repin to pcengine-python 03ac699 (2026-11-19)
 
-The base board's `03ac699` (local, not pushed) crops a display that starts before the row. A small
+The base board's `03ac699` (local then, on GitHub since 2026-11-20) crops a display that starts before the row. A small
 HDS puts the display start inside the sync; on `3318027` the row then grew from 341 to 682 dots
 (and pcengine-rust panicked). supergrafx-rust found it with its probe card in PC Engine position
 and on the fallback (its `docs/notes-on-the-reference.md`, item 7). The venvs were reinstalled

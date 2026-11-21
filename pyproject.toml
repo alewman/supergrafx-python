@@ -14,15 +14,12 @@ license = { file = "LICENSE" }
 authors = [{ name = "alewman" }]
 # The base board, pinned by git revision on GitHub (https://github.com/alewman/pcengine-python).
 # Nothing is copied from it. 03ac699 = 3318027 plus the crop of a display that starts before
-# the row (a small HDS; the row kept 1365 // divider dots instead of growing; LOCAL ONLY for
-# now, like 3318027: installed from the local clone as below, at this hash).
+# the row (a small HDS; the row kept 1365 // divider dots instead of growing).
 # 3318027 = the base board's clean rewrite of 2026-11-19 (a new VDC
 # line machine: display origin 8 dots earlier in the row, vblank_dots default -16, scroll latch,
 # sprite budget from the manual; old save states do not load; core huc6280-python 6ce348e, its
-# own clean rewrite). NOT YET ON GITHUB (local commits, unpushed): until Aubrey pushes both, the
-# venvs install it from the local clones, `pip install --no-deps git+file://<huc6280-python
-# clone>@6ce348e13c9ef3009bd07e7938c4b48956eeadc6` then the same for pcengine-python at the hash
-# below (docs/restart.md "Repin to the clean base board"). Over 4c32f26 = pcengine-python v0.2.0 (core huc6280-python v0.4.0), over
+# own clean rewrite). Both on GitHub since 2026-11-20 (installed from local clones before that,
+# docs/restart.md "Repin to the clean base board"). Over 4c32f26 = pcengine-python v0.2.0 (core huc6280-python v0.4.0), over
 # bc9b976 = pcengine-python v0.1.0 (core huc6280-python v0.3.0), over
 # c469e28 = b914413 plus the picture scripts' pad input and save
 # states (pcengine_python.state, which this package registers itself with). b914413 = a0114c5 plus the repin of huc6280-python to 9c47c98 (its

@@ -5,6 +5,10 @@ Releases are git tags. Not on PyPI (the base board is pinned by git commit).
 
 ## Unreleased
 
+- 2026-11-20: the pins are on GitHub (pcengine-python 03ac699, huc6280-python 6ce348e,
+  6502-python 2146eba); `pip install -e ".[dev]"` resolves them from there again. Checked in a
+  fresh PyPy venv: 44 tests pass, ruff clean.
+
 - Base board pcengine-python **03ac699** (local): a display that starts before the row is
   cropped and the row keeps its length (found by supergrafx-rust's probe card in compat and base
   mode). Quick suite, the probes and the five cards unchanged (docs/restart.md, last section).
@@ -12,7 +16,7 @@ Releases are git tags. Not on PyPI (the base board is pinned by git commit).
 Repin to the base board's clean rewrite (docs/restart.md, "Repin to the clean base board"):
 
 - Base board pcengine-python **3318027** (its clean VDC rewrite; core huc6280-python 6ce348e),
-  not yet on GitHub: the venvs install it from the local clones (pin comment). Save states from
+  then not yet on GitHub (pushed 2026-11-20; the venvs were installed from the local clones). Save states from
   the old pin do not load. No code used the removed base interfaces; nothing to adapt.
 - **U-SGX1 re-measured**: the base board's display starts 8 dots earlier in the row, and the
   probes put both detectors' window edges 8 dots earlier in row dots: `Vpc.WINDOW_ORIGIN` is now
