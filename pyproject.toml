@@ -28,7 +28,8 @@ authors = [{ name = "alewman" }]
 # has the public `HuC6280.opcode`. Repin deliberately and rerun the tests and the picture runs
 # (docs/m6-record.md).
 dependencies = [
-    "pcengine-python @ git+https://github.com/alewman/pcengine-python@03ac6998c812a291e5f91882552df5ae712ba870",
+    # 647de63: pcengine-python's history reset (2026-11-21), 03ac699's board (SPDX lines since).
+    "pcengine-python @ git+https://github.com/alewman/pcengine-python@647de63f60ce7a6a74f584c4e37673c2ba1505ba",
 ]
 
 [project.urls]
