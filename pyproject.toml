@@ -1,0 +1,69 @@
+# SPDX-License-Identifier: MIT
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "supergrafx-python"
+version = "0.1.1"
+description = "Readable, pure-Python NEC SuperGrafx: pcengine-python plus a second VDC and the HuC6202 VPC, through the base board's sockets"
+readme = "README.md"
+# The floor is the newest Python PyPy supports (3.11 as of PyPy 7.3.20); raise it when PyPy does.
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "alewman" }]
+# The base board, pinned by git revision on GitHub (https://github.com/alewman/pcengine-python).
+# Nothing is copied from it. 03ac699 = 3318027 plus the crop of a display that starts before
+# the row (a small HDS; the row kept 1365 // divider dots instead of growing).
+# 3318027 = the base board's clean rewrite of 2026-11-19 (a new VDC
+# line machine: display origin 8 dots earlier in the row, vblank_dots default -16, scroll latch,
+# sprite budget from the manual; old save states do not load; core huc6280-python 6ce348e, its
+# own clean rewrite). Both on GitHub since 2026-11-20 (installed from local clones before that,
+# docs/restart.md "Repin to the clean base board"). Over 4c32f26 = pcengine-python v0.2.0 (core huc6280-python v0.4.0), over
+# bc9b976 = pcengine-python v0.1.0 (core huc6280-python v0.3.0), over
+# c469e28 = b914413 plus the picture scripts' pad input and save
+# states (pcengine_python.state, which this package registers itself with). b914413 = a0114c5 plus the repin of huc6280-python to 9c47c98 (its
+# issue 0004: decimal ADC/SBC with an invalid BCD digit). a0114c5 = fc923c5 (issue 0002 port catch_up, no effect on the
+# SuperGrafx; issue 0003 audio mixer) plus the repin of huc6280-python to v0.2.0 (f31b630), which
+# has the public `HuC6280.opcode`. Repin deliberately and rerun the tests and the picture runs
+# (docs/m6-record.md).
+dependencies = [
+    "pcengine-python @ git+https://github.com/alewman/pcengine-python@03ac6998c812a291e5f91882552df5ae712ba870",
+]
+
+[project.urls]
+Homepage = "https://github.com/alewman/supergrafx-python"
+Repository = "https://github.com/alewman/supergrafx-python"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    # Pinned: `ruff format --check` must see the formatter the tree was formatted with.
+    "ruff==0.16.8",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/supergrafx_python"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["runs", "tests/runs"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "C4", "SIM", "PERF", "RUF"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["supergrafx_python"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers -ra -m 'not slow'"
+pythonpath = ["src", "tests"]
+markers = ["slow: runs a card for many emulated seconds (pytest -m slow)"]

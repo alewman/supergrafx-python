@@ -1,0 +1,92 @@
+<!-- SPDX-License-Identifier: MIT -->
+# Start here: the SuperGrafx as an add-on
+
+Read the base board's [docs/sockets.md](https://github.com/alewman/pcengine-python/blob/main/docs/sockets.md) ("SuperGrafx: add-on,
+with a measured fallback"), its [handoff-brief.md](https://github.com/alewman/pcengine-python/blob/main/docs/handoff-brief.md) (M6 row,
+U14) and MacDonald's `sgxtech.txt` (`pcengine-python/reference/docs/sgxtech.txt`, tier 2) first.
+
+## The machine
+
+[hw: sgxtech] A PC Engine with 32 KiB of work RAM, a second VDC with its own 64 KiB of VRAM, and a
+**HuC6202 VPC** between the two VDC pixel buses (9 bits each: sprite flag, palette, colour) and the
+VCE. The VPC also decodes the video chip area, mixes by two window areas and four 4-bit priority
+groups, and steers `ST0`-`ST2` to either VDC. A switch on the back selects PC Engine compatibility
+(VDC 1 mirrored every 4 bytes through `$FF:0000-03FF`) or native SuperGrafx decode.
+
+Native decode of `$FF:0000-03FF`, a 32-byte block repeated through the 1 KiB:
+
+| Offset | Device |
+| --- | --- |
+| `$00-$03`, `$04-$07` | VDC 1 (mirror) |
+| `$08-$0F` | VPC: `$08`/`$09` priority groups, `$0A-$0D` window widths, `$0E` ST steering, `$0F` unused |
+| `$10-$13`, `$14-$17` | VDC 2 (mirror) |
+| `$18-$1F` | unused, reads `$FF` |
+
+The bank map is the base board's (work RAM in `$F8-$FB`) with 32 KiB instead of the 8 KiB mirror;
+`$80-$F7` and `$FC-$FE` read `$FF`.
+
+## The sockets this board uses
+
+| Base socket (docs/sockets.md) | Use here |
+| --- | --- |
+| 3 one decode | `VideoPage` claims pages `$1FE0-$1FE3` over the base VDC page |
+| 6 interrupts | `Board.lines()` ORs both VDCs' IRQ1 (the base board change, see below) |
+| 7 pixel path | `Vpc.mix` is the board's `PixelPath`: one row per VDC in, one row out |
+| 8 video timing | both VDCs are hsync'd and vsync'd by the base scheduler |
+| 12 instances | the second VDC is a second `pcengine_python.vdc.Vdc`; the machine row sets `vdc_count=2` |
+| machine table | `SUPERGRAFX = Machine("SuperGrafx", True, work_ram_bytes=32 KiB, vdc_count=2)` |
+
+**One base-board change was needed** and is documented there as
+`pcengine-python/docs/issues/0001-second-vdc-not-run-by-the-board.md` (local commit `5d9dc86`):
+`Machine.vdc_count` was a table field nothing read, so the board built one VDC only. It now builds
+`Board.vdcs`, steps, syncs and reads the rows of all of them. With `vdc_count=1` nothing moves
+(tests, and captured frames hashed before and after).
+
+One thing is **not** a socket: `ST0-ST2` look like plain stores to `$1FE000/2/3` on the
+bus. `SuperGrafx._store_immediate` reads the core's public `HuC6280.opcode` (huc6280-python
+since v0.2.0; the pinned pcengine-python brings the core in). The add-on keeps a fallback to
+the private `_opcode` for a core without the accessor (the test double covers both); nothing needs
+a PYTHONPATH override any more.
+
+## Module shape
+
+```
+supergrafx_python/
+  machine.py   the SUPERGRAFX row of the base board's machine table
+  vpc.py       Vpc (registers, mix = PixelPath, named switches) and VideoPage (the decode)
+  board.py     SuperGrafx: a base Board with the row, the VPC as pixel path, the page claimed
+scripts/
+  sgx_ours.py      run a card for N frames, modes sgx | compat | base (the fallback)
+  sgx_pictures.py  the five cards against Mesen2 and Beetle PCE (one niced run at a time)
+  sgx_mame.py      the five cards against MAME `sgx` (crude statistics)
+  sgx_fallback.py  the cards on the plain base board (the fallback), measured
+  sgx_state.py     save states: the round trip on real cards
+  sgx_probe.py     window and backdrop probe cards of our own, against Mesen2 and Beetle PCE
+```
+
+Nothing is copied from the base board; the picture scripts import the base repository's
+`scripts/` (tooling) by path (`PCENGINE_PYTHON`, default the sibling checkout `../pcengine-python`).
+
+## Save states
+
+The base board's `pcengine_python.state` (its docs/start-here.md "Save states") covers the SuperGrafx:
+this package registers itself, and the VPC, the video page and the second VDC are reached from the
+board like any other part.
+
+```python
+from pcengine_python.state import load_state, save_state
+
+data = save_state(system)  # system = SuperGrafx(card=...).build()
+load_state(another, data)  # a SuperGrafx built the same way, the same card
+```
+
+Measured 2026-11-12 (`scripts/sgx_state.py`, PyPy: every CPU bus cycle, the mixed picture, the audio
+and the CPU's state of every frame after the save, on a fresh machine and on one that had run): the
+five library cards saved inside frame 300 with a RUN press before, 60 frames each; Daimakaimura in
+stage 1 (saved inside frame 1650, pad input after the save); Daimakaimura in PC Engine position
+(`--mode compat`). 7 of 7 equal. Unit tests: `tests/test_state.py`.
+
+## Rules
+
+Python floor 3.11 (PyPy); correct, not fast; HuCards read in place by path, never committed;
+temp files only in a scratch directory; no destructive one-liners.
